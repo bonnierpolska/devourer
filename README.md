@@ -39,6 +39,10 @@ The init function gives details so you don't need to repeat them elsewhere, enab
 raising exceptions on error. You can also obtain raw string with `load_json=False` and silence errors getting
 None instead when they happen with `throw_on_error=False`.
 
+Installation
+------------
+You can just `pip install devourer`.
+
 Documentation
 -------------
 
