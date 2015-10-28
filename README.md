@@ -5,38 +5,46 @@ Devourer is a generic API client. It features an object-oriented, declarative ap
 It depends on the brilliant requests package as the gateway to API server. A simple example:
 
 ```python
-from devourer import GenericAPI
+from devourer import GenericAPI, APIMethod, APIError
 
 
 class TestApi(GenericAPI):
-    categories = APIMethod('get', 'categories/')
-    news_list = APIMethod('get', 'news/list/{id}/')
-    news = APIMethod('get', 'news/{id}/')
-    add_news = APIMethod('post', 'news/')
+    posts = APIMethod('get', 'posts/')
+    comments = APIMethod('get', 'posts/{id}/comments')
+    post = APIMethod('get', 'posts/{id}/')
+    add_post = APIMethod('post', 'posts/')
 
     def __init__(self):
-        super(TestApi, self).__init__('https://test.api.com/v1/',
-                                      (user, password),
+        super(TestApi, self).__init__('http://jsonplaceholder.typicode.com/',
+                                      None,  # this can be ('user', 'password')
+                                             # or requests auth object
                                       load_json=True,
                                       throw_on_error=True
                                      )
                                      
 api = TestApi()
-categories = api.categories()
-news_list = api.news_list(id=categories[0]['id'])
-news = api.news(id=news_list[0]['id'])
-status = api.add_news(author='John Doe', title='Breaking news', content='I just got devoured.')
+posts = api.posts()
+post = api.post(id=posts[0]['id'])
+comments = api.comments(id=post['id'])
+new_post_id = api.add_post(userId=1,
+                           title='Breaking news',
+                           body='I just got devoured.')
+try:
+    post = api.post(id=new_post_id)
+except APIError:
+    print('Oops, this API is not persistent!')
 ```
 
 The init function gives details so you don't need to repeat them elsewhere, enables parsing json responses and
-raising exceptions on error.
+raising exceptions on error. You can also obtain raw string with `load_json=False` and silence errors getting
+None instead when they happen with `throw_on_error=False`.
 
 Contributions
-=============
+-------------
 
 Please read CONTRIBUTORS file before submitting a pull request.
 For now we don't have any CI going on, but you can run lint and coverage by hand. The targets are 10.00 and 100%,
-respectively. You will need to pip install coverage pylint to do it.
+respectively. You will need to `pip install coverage pylint` to do it.
 
 ```
 pylint devourer --rcfile=.pylintrc
