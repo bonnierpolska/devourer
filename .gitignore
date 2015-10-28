@@ -57,3 +57,6 @@ target/
 
 # JetBrains
 .idea/
+
+# PyPI
+.pypirc

@@ -39,6 +39,12 @@ The init function gives details so you don't need to repeat them elsewhere, enab
 raising exceptions on error. You can also obtain raw string with `load_json=False` and silence errors getting
 None instead when they happen with `throw_on_error=False`.
 
+Documentation
+-------------
+
+Feel free to browse the code and especially the tests to see what's going on behind the scenes.
+The current version of docs is available on http://devourer.readthedocs.org/en/latest/.
+
 Contributions
 -------------
 
