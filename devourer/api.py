@@ -47,7 +47,7 @@ class APIMethod(object):
     string formatting. Usually you don't need to call any methods by hand.
 
     Example:
-    
+
     >>> post = APIMethod('get', 'post/{id}/')
     """
     def __init__(self, http_method, schema):

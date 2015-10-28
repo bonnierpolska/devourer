@@ -11,12 +11,16 @@ It depends on the brilliant requests package as the gateway to API server. A sim
 >>>     post = APIMethod('get', 'posts/{id}/')
 >>>     add_post = APIMethod('post', 'posts/')
 >>>
->>>     def __init__(self):
->>>         params = ('http://jsonplaceholder.typicode.com/',
->>>                   None,  # this can be ('user', 'password')
->>>                          # or requests auth object
->>>                   load_json=True,
->>>                   throw_on_error=True)
+>>>     def __init__(self,
+>>>                  url=None,
+>>>                  auth=None,
+>>>                  throw_on_error=True,
+>>>                  load_json=True):
+>>>         params = (url or 'http://jsonplaceholder.typicode.com/',
+>>>                   auth or None,  # this can be ('user', 'password')
+>>>                                  # or requests auth object
+>>>                   load_json=load_json,
+>>>                   throw_on_error=throw_on_error)
 >>>         super(TestApi, self).__init__(*params)
 >>>
 >>> api = TestApi()
