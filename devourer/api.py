@@ -127,7 +127,7 @@ class GenericAPICreator(type):
         # We don't want to modify the base classes, just the implementations of them.
         if not (len(bases) == 1 and object in bases):
             attrs['_methods'] = {}
-            for key, item in attrs.iteritems():
+            for key, item in attrs.items():
                 if isinstance(item, APIMethod):
                     attrs['_methods'][key] = item
                     item.name = key
@@ -208,7 +208,7 @@ class GenericAPI(object):
         self.auth = auth
         self.throw_on_error = throw_on_error
         self.load_json = load_json
-        for item in self._methods.itervalues():
+        for item in self._methods.values():
             item.api = self
 
     def prepare(self, name, *args, **kwargs):
