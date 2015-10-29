@@ -61,8 +61,10 @@ Contributions
 -------------
 
 Please read CONTRIBUTORS file before submitting a pull request.
+
 We use Travis CI. The targets are 10.00 for lint 10.00 and 100% for coverage, as well as building sphinx docs.
-You will need to `pip install -r requirements.txt` to do it.
+
+You can of also check the build manually, just make sure to `pip install -r requirements.txt` before:
 
 ```
 pylint devourer --rcfile=.pylintrc
