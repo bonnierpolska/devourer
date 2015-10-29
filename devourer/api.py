@@ -106,7 +106,7 @@ class APIMethod(object):
         :param kwargs: Additional parameters to be passed to remote API.
         :returns: API request's result.
         """
-        params = {key: value for key, value in kwargs.iteritems() if key not in self.params}
+        params = {key: value for key, value in kwargs.items() if key not in self.params}
         return self.api.invoke(self.http_method, self.schema.format(**kwargs), params=params)
 
 
@@ -158,15 +158,35 @@ class GenericAPI(object):
     Hooks can be overridden globally:
 
     >>> def prepare(self, name, **args, **kwargs):
-    >>>     pass
-    As well as for particular methods:
+    >>>     return PrepareCallArgs(call=self._methods[name],
+    >>>                            args=args,
+    >>>                            kwargs=kwargs)
+
+    As well as for particular methods only:
 
     >>> def prepare_method1(self, name, *args, **kwargs):
-    >>>     pass
+    >>>     return PrepareCallArgs(call=self._methods[name],
+    >>>                            args=args,
+    >>>                            kwargs=kwargs)
+
     >>> def call_method1(self, name, *args, **kwargs):
-    >>>     pass
+    >>>     prepared = getattr(self, 'prepare_{}'.format(name))
+    >>>     prepared = prepared(name, *args, **kwargs)
+    >>>     callback = getattr(self, 'finalize_{}'.format(name))
+    >>>     return callback(name,
+    >>>                     prepared.call(*prepared.args,
+    >>>                                   **prepared.kwargs),
+    >>>                     *prepared.args,
+    >>>                     **prepared.kwargs)
+
     >>> def finalize_method2(self, name, result, *args, **kwargs):
-    >>>     pass
+    >>>     if self.throw_on_error and result.status_code >= 400:
+    >>>         error_msg = "Error when invoking {} with parameters {} {}: {}"
+    >>>         params = (name, args, kwargs, result.__dict__)
+    >>>         raise APIError(error_msg.format(*params))
+    >>>     if self.load_json:
+    >>>         return json.loads(result.content
+    >>>     return result.content
 
     :type _methods: dict
     """

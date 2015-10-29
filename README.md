@@ -1,6 +1,8 @@
 Devourer
 ========
 
+[![Build Status](https://travis-ci.org/bonnierpolska/devourer.svg)](https://travis-ci.org/bonnierpolska/devourer)
+
 Devourer is a generic API client. It features an object-oriented, declarative approach to simplify the communication.
 It depends on the brilliant requests package as the gateway to API server. A simple example:
 
@@ -49,14 +51,21 @@ Documentation
 Feel free to browse the code and especially the tests to see what's going on behind the scenes.
 The current version of docs is available on http://devourer.readthedocs.org/en/latest/.
 
+Questions and contact
+---------------------
+
+If you have any questions, feedback, want to say hi or talk about Python, just hit me up on
+https://twitter.com/bujniewicz
+
 Contributions
 -------------
 
 Please read CONTRIBUTORS file before submitting a pull request.
-For now we don't have any CI going on, but you can run lint and coverage by hand. The targets are 10.00 and 100%,
-respectively. You will need to `pip install coverage pylint` to do it.
+We use Travis CI. The targets are 10.00 for lint 10.00 and 100% for coverage, as well as building sphinx docs.
+respectively. You will need to `pip install -r requirements.txt` to do it.
 
 ```
 pylint devourer --rcfile=.pylintrc
 coverage run --source=devourer -m devourer.tests && coverage report -m
+cd docs && make html
 ```
