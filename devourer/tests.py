@@ -88,7 +88,7 @@ class GenericAPITest(unittest.TestCase):
         :return:
         """
         api = self.TestAPI('http://jsonplaceholder.typicode.com/', None, load_json=False)
-        self.assertIn('Presley.Mueller@myrl.com', api.comments(id=2))
+        self.assertNotEqual(api.comments(id=2).find(b'Presley.Mueller@myrl.com'), -1)
 
 
 if __name__ == '__main__':

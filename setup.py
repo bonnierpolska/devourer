@@ -3,7 +3,11 @@ from distutils.core import setup
 setup(
     name='devourer',
     packages=['devourer'],
-    version='0.1',
+    version='0.2',
+    install_requires=[
+        'requests',
+        'six',
+    ],
     description='Devourer is a generic API client.'
                 'It features an object-oriented, declarative approach to simplify the communication.',
     author='Bonnier Business Polska / Krzysztof Bujniewicz',

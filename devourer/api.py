@@ -5,9 +5,11 @@
      all the helper classes it requires to work.
 
 """
-from string import Formatter
-import requests
 import json
+from string import Formatter
+
+import requests
+from six import with_metaclass
 
 __all__ = ['APIMethod', 'GenericAPI', 'APIError', 'PrepareCallArgs']
 
@@ -125,7 +127,7 @@ class GenericAPICreator(type):
         """
         methods = {}
         # We don't want to modify the base classes, just the implementations of them.
-        if not (len(bases) == 1 and object in bases):
+        if bases != (GenericAPIBase, ):
             attrs['_methods'] = {}
             for key, item in attrs.items():
                 if isinstance(item, APIMethod):
@@ -146,51 +148,13 @@ class GenericAPICreator(type):
         return model
 
 
-class GenericAPI(object):
-    """This is the base API representation class.
+class GenericAPIBase(object):
+    """This is the base API representation class without declarative syntax.
 
-    You can build a concrete API by declaring methods while creating the class, ie.:
-
-    >>> class MyAPI(GenericAPI):
-    >>>     method1 = APIMethod('get', 'people/')
-    >>>     method2 = APIMethod('post', 'my/news/items/')
-
-    Hooks can be overridden globally:
-
-    >>> def prepare(self, name, **args, **kwargs):
-    >>>     return PrepareCallArgs(call=self._methods[name],
-    >>>                            args=args,
-    >>>                            kwargs=kwargs)
-
-    As well as for particular methods only:
-
-    >>> def prepare_method1(self, name, *args, **kwargs):
-    >>>     return PrepareCallArgs(call=self._methods[name],
-    >>>                            args=args,
-    >>>                            kwargs=kwargs)
-
-    >>> def call_method1(self, name, *args, **kwargs):
-    >>>     prepared = getattr(self, 'prepare_{}'.format(name))
-    >>>     prepared = prepared(name, *args, **kwargs)
-    >>>     callback = getattr(self, 'finalize_{}'.format(name))
-    >>>     return callback(name,
-    >>>                     prepared.call(*prepared.args,
-    >>>                                   **prepared.kwargs),
-    >>>                     *prepared.args,
-    >>>                     **prepared.kwargs)
-
-    >>> def finalize_method2(self, name, result, *args, **kwargs):
-    >>>     if self.throw_on_error and result.status_code >= 400:
-    >>>         error_msg = "Error when invoking {} with parameters {} {}: {}"
-    >>>         params = (name, args, kwargs, result.__dict__)
-    >>>         raise APIError(error_msg.format(*params))
-    >>>     if self.load_json:
-    >>>         return json.loads(result.content
-    >>>     return result.content
+    Requires GenericAPICreator metaclass to work.
 
     :type _methods: dict
     """
-    __metaclass__ = GenericAPICreator
     _methods = None
 
     def __init__(self, url, auth, throw_on_error=False, load_json=False):
@@ -242,7 +206,8 @@ class GenericAPI(object):
             error_msg = "Error when invoking {} with parameters {} {}: {}"
             raise APIError(error_msg.format(name, args, kwargs, result.__dict__))
         if self.load_json:
-            return json.loads(result.content)
+            content = result.content if isinstance(result.content, str) else result.content.decode('utf-8')
+            return json.loads(content)
         return result.content
 
     def call(self, name, *args, **kwargs):
@@ -282,3 +247,47 @@ class GenericAPI(object):
         :returns: response object as in requests.
         """
         return getattr(requests, http_method)(self.url + url, auth=self.auth, params=params)
+
+class GenericAPI(with_metaclass(GenericAPICreator, GenericAPIBase)):
+    """This is the base API representation class.
+
+    You can build a concrete API by declaring methods while creating the class, ie.:
+
+    >>> class MyAPI(GenericAPI):
+    >>>     method1 = APIMethod('get', 'people/')
+    >>>     method2 = APIMethod('post', 'my/news/items/')
+
+    Hooks can be overridden globally:
+
+    >>> def prepare(self, name, **args, **kwargs):
+    >>>     return PrepareCallArgs(call=self._methods[name],
+    >>>                            args=args,
+    >>>                            kwargs=kwargs)
+
+    As well as for particular methods only:
+
+    >>> def prepare_method1(self, name, *args, **kwargs):
+    >>>     return PrepareCallArgs(call=self._methods[name],
+    >>>                            args=args,
+    >>>                            kwargs=kwargs)
+
+    >>> def call_method1(self, name, *args, **kwargs):
+    >>>     prepared = getattr(self, 'prepare_{}'.format(name))
+    >>>     prepared = prepared(name, *args, **kwargs)
+    >>>     callback = getattr(self, 'finalize_{}'.format(name))
+    >>>     return callback(name,
+    >>>                     prepared.call(*prepared.args,
+    >>>                                   **prepared.kwargs),
+    >>>                     *prepared.args,
+    >>>                     **prepared.kwargs)
+
+    >>> def finalize_method2(self, name, result, *args, **kwargs):
+    >>>     if self.throw_on_error and result.status_code >= 400:
+    >>>         error_msg = "Error when invoking {} with parameters {} {}: {}"
+    >>>         params = (name, args, kwargs, result.__dict__)
+    >>>         raise APIError(error_msg.format(*params))
+    >>>     if self.load_json:
+    >>>         return json.loads(result.content)
+    >>>     return result.content
+    """
+    pass
