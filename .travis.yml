@@ -6,6 +6,7 @@ python:
   - "3.5"
   - "pypy"
 script:
-  - pylint devourer --rcfile=.pylintrc
+  # need to skip pylint on 3.5 since it doesn't work yet.
+  - if [[ $TRAVIS_PYTHON_VERSION != '3.5' ]]; then pylint devourer --rcfile=.pylintrc; fi
   - coverage run --source=devourer -m devourer.tests && coverage report -m
   - cd docs && make html
