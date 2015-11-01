@@ -63,7 +63,6 @@ class APIMethod(object):
         :returns: None
         """
         self.name = None
-        self.api = None
         self.http_method = http_method
         self._params = []
         self._schema = None
@@ -99,7 +98,7 @@ class APIMethod(object):
         """
         return self._params
 
-    def __call__(self, **kwargs):
+    def __call__(self, api, **kwargs):
         """
         This method sends a request to API through invoke function from API object
         the method is assigned to. It calls invoke with formatted schema, additional
@@ -109,7 +108,7 @@ class APIMethod(object):
         :returns: API request's result.
         """
         params = {key: value for key, value in kwargs.items() if key not in self.params}
-        return self.api.invoke(self.http_method, self.schema.format(**kwargs), params=params)
+        return api.invoke(self.http_method, self.schema.format(**kwargs), params=params)
 
 
 class GenericAPICreator(type):
@@ -224,7 +223,7 @@ class GenericAPIBase(object):
         """
         prepared = getattr(self, 'prepare_{}'.format(name))(name, *args, **kwargs)
         return getattr(self, 'finalize_{}'.format(name))(name,
-                                                         prepared.call(*prepared.args, **prepared.kwargs),
+                                                         prepared.call(self, *prepared.args, **prepared.kwargs),
                                                          *prepared.args,
                                                          **prepared.kwargs)
 

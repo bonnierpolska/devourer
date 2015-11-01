@@ -50,7 +50,7 @@ class GenericAPITest(unittest.TestCase):
                 :return: result of finalize_posts.
                 """
                 prepared = self.prepare('posts', *args, **kwargs)
-                result = prepared.call(*args, **kwargs)
+                result = prepared.call(self, *args, **kwargs)
                 return self.finalize('posts', result, *args, **kwargs)
         cls.TestAPI = TestAPI
         cls.api = TestAPI('http://jsonplaceholder.typicode.com/', None, load_json=True)
