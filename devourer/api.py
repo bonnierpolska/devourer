@@ -132,12 +132,12 @@ class GenericAPICreator(type):
                 if isinstance(item, APIMethod):
                     attrs['_methods'][key] = item
                     item.name = key
-                    methods['prepare_{}'.format(key)] = attrs['prepare_{}'.format(key)] if \
-                        'prepare_{}'.format(key) in attrs else GenericAPI.prepare
+                    methods['prepare_{}'.format(key)] = attrs['prepare'] if \
+                        'prepare' in attrs else GenericAPI.prepare
                     methods['{}'.format(key)] = attrs['call_{}'.format(key)] if \
                         'call_{}'.format(key) in attrs else GenericAPI.outer_call(key)
-                    methods['finalize_{}'.format(key)] = attrs['finalize_{}'.format(key)] if \
-                        'finalize_{}'.format(key) in attrs else GenericAPI.finalize
+                    methods['finalize_{}'.format(key)] = attrs['finalize'] if \
+                        'finalize' in attrs else GenericAPI.finalize
             for key in attrs['_methods']:
                 del attrs[key]
                 if 'call_{}'.format(key) in attrs:
