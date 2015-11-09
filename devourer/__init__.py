@@ -41,4 +41,4 @@ None instead when they happen with `throw_on_error=False`.
 
 """
 
-from .api import GenericAPI, APIMethod, APIError, PrepareCallArgs, GenericAPICreator
+from .api import GenericAPI, APIMethod, APIError, PrepareCallArgs, GenericAPICreator, GenericAPIBase
