@@ -13,6 +13,9 @@ Contents:
 
 .. automodule:: devourer
 
+.. autoclass:: GenericAPIBase
+    :members:
+
 .. autoclass:: GenericAPI
     :members:
 
