@@ -53,6 +53,9 @@ Documentation
 Feel free to browse the code and especially the tests to see what's going on behind the scenes.
 The current version of docs is available on http://devourer.readthedocs.org/en/latest/.
 
+There's also an article on the thought process behind devourer on http://bujniewi.cz/devouring-an-api/ - it's a five
+minute read, but it could answer a few questions you might have. 
+
 Questions and contact
 ---------------------
 
@@ -64,12 +67,22 @@ Contributions
 
 Please read CONTRIBUTORS file before submitting a pull request.
 
-We use Travis CI. The targets are 10.00 for lint 10.00 and 100% for coverage, as well as building sphinx docs.
+We use Travis CI. The targets are 10.00 for lint and 100% for coverage, as well as building sphinx docs.
 
-You can of also check the build manually, just make sure to `pip install -r requirements.txt` before:
+You can also check the build manually, just make sure to `pip install -r requirements.txt` before:
 
 ```
 pylint devourer --rcfile=.pylintrc
 coverage run --source=devourer -m devourer.tests && coverage report -m
 cd docs && make html
 ```
+
+Additionally you can check cyclomatic complexity and maintenance index with radon:
+
+```
+radon cc devourer
+radon mi devourer
+```
+
+The target is A for maintenance index, C for cyclomatic complexity - but don't worry if it isn't met, I can
+refactor it after merging.

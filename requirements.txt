@@ -1,5 +1,6 @@
 coverage
 pylint
+radon
 requests
 six
 sphinx
