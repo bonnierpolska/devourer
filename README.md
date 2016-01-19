@@ -5,6 +5,8 @@ Devourer
 
 Devourer is a generic REST API client for Python 2.7 and 3.3+.
 
+You can also subclass it to wrap a set of system calls, FFI or a messy dependency.
+
 It features an object-oriented, declarative approach to simplify the communication.
 It depends on the brilliant requests package as the gateway to API server. A simple example:
 
