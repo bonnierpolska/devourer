@@ -19,6 +19,7 @@ class APIMethodTest(unittest.TestCase):
         self.assertFalse(method.params)
         method = APIMethod('get', 'a/{b}')
         self.assertEqual(method.params, ['b'])
+        self.assertRaises(ValueError, APIMethod, 'options', 'foo')
 
 
 class GenericAPITest(unittest.TestCase):
@@ -40,7 +41,7 @@ class GenericAPITest(unittest.TestCase):
             """
             posts = APIMethod('get', 'posts/')
             comments = APIMethod('get', 'posts/{id}/comments')
-            false = APIMethod('get', 'postssss/{id}/comments')
+            false = APIMethod('get', 'postssss/{id}/comments')        
 
             def call_posts(self, *args, **kwargs):
                 """

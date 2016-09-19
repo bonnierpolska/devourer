@@ -13,6 +13,10 @@ from six import with_metaclass
 
 __all__ = ['APIMethod', 'GenericAPI', 'APIError', 'PrepareCallArgs']
 
+# Allows only methods used for common API communication - no reason to
+# support all existing methods (and I'd rather have this check in place
+# instead of allowing any string to be passed as http_method later on)
+ALLOWED_HTTP_METHODS = ['get', 'post', 'put', 'delete']
 
 class APIError(Exception):
     """
@@ -63,6 +67,8 @@ class APIMethod(object):
         :returns: None
         """
         self.name = None
+        if http_method not in ALLOWED_HTTP_METHODS:
+            raise ValueError('Unsupported HTTP method: {}'.format(http_method))
         self.http_method = http_method
         self._params = []
         self._schema = None
