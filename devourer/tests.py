@@ -2,7 +2,7 @@
 This module contains tests for generic_api package.
 """
 import unittest
-from . import GenericAPI, APIMethod, APIError
+from . import GenericAPI, AsyncRequest, APIMethod, APIError
 
 
 class APIMethodTest(unittest.TestCase):
@@ -39,9 +39,10 @@ class GenericAPITest(unittest.TestCase):
             known data to enable full testing without mocking.
             :return:
             """
+            generate_async_methods = True
             posts = APIMethod('get', 'posts/')
             comments = APIMethod('get', 'posts/{id}/comments')
-            false = APIMethod('get', 'postssss/{id}/comments')        
+            false = APIMethod('get', 'error')
 
             def call_posts(self, *args, **kwargs):
                 """
@@ -63,6 +64,9 @@ class GenericAPITest(unittest.TestCase):
         """
         self.assertTrue(hasattr(self.api, 'posts'))
         self.assertTrue(hasattr(self.api, 'comments'))
+        self.assertTrue(hasattr(self.api, 'posts_async'))
+        self.assertTrue(hasattr(self.api, 'comments_async'))
+        self.assertTrue(hasattr(self.api, 'false_async'))        
         self.assertTrue(hasattr(self.api, 'finalize_posts'))
         self.assertTrue(hasattr(self.api, 'finalize_comments'))
         self.assertIsInstance(self.api.prepare('posts').call.api, self.TestAPI)
@@ -74,6 +78,16 @@ class GenericAPITest(unittest.TestCase):
         """
         self.assertEqual(self.api.posts()[1]['id'], 2)
         self.assertEqual(self.api.comments(id=2)[0]['email'], 'Presley.Mueller@myrl.com')
+        
+    def test_async_calls(self):
+        """
+        This test checks async calls
+        :return:
+        """
+        self.assertIsInstance(self.api.posts_async(), AsyncRequest)
+        self.assertEqual(self.api.posts_async().result()[1]['id'], 2)
+        self.assertEqual(self.api.comments_async(id=2).result()[0]['email'], 'Presley.Mueller@myrl.com')
+        self.assertEqual(self.api.false_async(id=1).result(), None)
 
     def test_exceptions(self):
         """

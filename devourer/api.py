@@ -8,6 +8,11 @@
 import json
 from string import Formatter
 
+from gevent import monkey
+monkey.patch_all()
+
+import gevent
+
 import requests
 from six import with_metaclass
 
@@ -17,6 +22,9 @@ __all__ = ['APIMethod', 'GenericAPI', 'APIError', 'PrepareCallArgs']
 # support all existing methods (and I'd rather have this check in place
 # instead of allowing any string to be passed as http_method later on)
 ALLOWED_HTTP_METHODS = ['get', 'post', 'put', 'delete']
+
+# Default time (seconds) to wait for thread before timing out
+DEFAULT_ASYNC_TIMEOUT = 5.0
 
 class APIError(Exception):
     """
@@ -44,6 +52,44 @@ class PrepareCallArgs(object):  # pylint: disable=too-few-public-methods
         self.call = call or (lambda *arguments, **keywords: None)
         self.args = args or []
         self.kwargs = kwargs or {}
+
+
+class AsyncRequest(object):
+    """ Asynchronous request.
+    Accept same parameters as ``Session.request`` and some additional:
+    :param session: Session which will do request
+    :param callback: Callback called on response.
+                     Same as passing ``hooks={'response': callback}``
+    """
+    def __init__(self, api, prepare_func, finalize_func):
+        self.prepare_func = prepare_func
+        self.finalize_func = finalize_func
+        self.response = None
+        self.api = api
+        self.thread = gevent.spawn(lambda x: x.call(), self)
+
+    def call(self):
+        """
+        Calls API method asynchroneously and saves response
+        """
+        self.response = self.prepare_func.call(self.api,
+                                               *self.prepare_func.args,
+                                               **self.prepare_func.kwargs)
+
+    def result(self, timeout=DEFAULT_ASYNC_TIMEOUT):
+        """
+        Fetches result from async call. If needed, waits for the result
+        for a specified amount of time, and returns None if result is
+        still not available.
+        :param timeout: Seconds to wait for the result before returning
+        None
+        """
+        self.thread.join(float(timeout))
+        if self.response:
+            # Process async response through the same finalize method as
+            # synchroneous call
+            return self.finalize_func(self.response)
+        return None
 
 
 class APIMethod(object):
@@ -134,6 +180,7 @@ class GenericAPICreator(type):
         # We don't want to modify the base classes, just the implementations of them.
         if bases != (GenericAPIBase, ):
             attrs['_methods'] = {}
+            generate_async_methods = attrs.get('generate_async_methods', False)
             for key, item in attrs.items():
                 if isinstance(item, APIMethod):
                     attrs['_methods'][key] = item
@@ -142,6 +189,9 @@ class GenericAPICreator(type):
                         'prepare' in attrs else GenericAPI.prepare
                     methods['{}'.format(key)] = attrs['call_{}'.format(key)] if \
                         'call_{}'.format(key) in attrs else GenericAPI.outer_call(key)
+                    # Generate additional _async methods if enabled
+                    if generate_async_methods:
+                        methods['{}_async'.format(key)] = GenericAPI.outer_async_call(key)
                     methods['finalize_{}'.format(key)] = attrs['finalize'] if \
                         'finalize' in attrs else GenericAPI.finalize
             for key in attrs['_methods']:
@@ -233,6 +283,19 @@ class GenericAPIBase(object):
                                                          *prepared.args,
                                                          **prepared.kwargs)
 
+    def call_async(self, name, *args, **kwargs):
+        """
+        This function asynchronously invokes API method from the class
+        declaration. It takes the same arguments as 'call' method, with
+        exception that it returns AsyncRequest object instead of the
+        result of finalize_method call
+        :returns: AsyncRequest object, which can be used to fetch result
+        of asynchroneous call
+        """
+        prepare_func = getattr(self, 'prepare_{}'.format(name))(name, *args, **kwargs)
+        finalize_func = lambda *args, **kwargs: getattr(self, 'finalize_{}'.format(name))(name, *args, **kwargs)
+        return AsyncRequest(self, prepare_func, finalize_func)
+
     @classmethod
     def outer_call(cls, name):
         """
@@ -243,6 +306,16 @@ class GenericAPIBase(object):
         :returns: drop-in call replacement lambda.
         """
         return lambda obj, *args, **kwargs: obj.call(name, *args, **kwargs)
+
+    @classmethod
+    def outer_async_call(cls, name):
+        """
+        This is a wrapper creating anonymous function invoking async call with
+        correct method name.
+        :param name: Name of method for which call wrapper has to be created.
+        :returns: drop-in call replacement lambda.
+        """
+        return lambda obj, *args, **kwargs: obj.call_async(name, *args, **kwargs)
 
     def invoke(self, http_method, url, params):
         """
