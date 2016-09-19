@@ -66,7 +66,7 @@ class GenericAPITest(unittest.TestCase):
         self.assertTrue(hasattr(self.api, 'comments'))
         self.assertTrue(hasattr(self.api, 'posts_async'))
         self.assertTrue(hasattr(self.api, 'comments_async'))
-        self.assertTrue(hasattr(self.api, 'false_async'))        
+        self.assertTrue(hasattr(self.api, 'false_async'))
         self.assertTrue(hasattr(self.api, 'finalize_posts'))
         self.assertTrue(hasattr(self.api, 'finalize_comments'))
         self.assertIsInstance(self.api.prepare('posts').call.api, self.TestAPI)
