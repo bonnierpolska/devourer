@@ -56,7 +56,6 @@ class GenericAPITest(unittest.TestCase):
                 return self.finalize('posts', result, *args, **kwargs)
         cls.TestAPI = TestAPI
         cls.api = TestAPI('http://jsonplaceholder.typicode.com/', None, load_json=True)
-        print dir(cls.api)
 
     def test_creation(self):
         """
