@@ -5,16 +5,14 @@
      all the helper classes it requires to work.
 
 """
+import gevent
+import requests
 import json
+from six import with_metaclass
 from string import Formatter
 
 from gevent import monkey
 monkey.patch_all()
-
-import gevent
-
-import requests
-from six import with_metaclass
 
 __all__ = ['APIMethod', 'GenericAPI', 'APIError', 'PrepareCallArgs']
 
