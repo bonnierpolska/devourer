@@ -56,6 +56,7 @@ class GenericAPITest(unittest.TestCase):
                 return self.finalize('posts', result, *args, **kwargs)
         cls.TestAPI = TestAPI
         cls.api = TestAPI('http://jsonplaceholder.typicode.com/', None, load_json=True)
+        print dir(cls.api)
 
     def test_creation(self):
         """
@@ -75,7 +76,7 @@ class GenericAPITest(unittest.TestCase):
         """
         self.assertEqual(self.api.posts()[1]['id'], 2)
         self.assertEqual(self.api.comments(id=2)[0]['email'], 'Presley.Mueller@myrl.com')
-        
+
     def test_async_calls(self):
         """
         This test checks async calls
