@@ -7,13 +7,11 @@
 """
 import json
 from string import Formatter
-
+from six import with_metaclass
+import requests
 import gevent
 from gevent import monkey
 monkey.patch_all()
-
-import requests
-from six import with_metaclass
 
 
 __all__ = ['APIMethod', 'GenericAPI', 'APIError', 'PrepareCallArgs']
