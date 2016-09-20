@@ -8,7 +8,9 @@ Devourer is a generic REST API client for Python 2.7 and 3.3+.
 You can also subclass it to wrap a set of system calls, FFI or a messy dependency.
 
 It features an object-oriented, declarative approach to simplify the communication.
-It depends on the brilliant requests package as the gateway to API server. A simple example:
+It depends on the brilliant requests package as the gateway to API server. 
+
+### Basic usage
 
 ```python
 from devourer import GenericAPI, APIMethod, APIError
@@ -44,6 +46,27 @@ except APIError:
 The init function gives details so you don't need to repeat them elsewhere, enables parsing json responses and
 raising exceptions on error. You can also obtain raw string with `load_json=False` and silence errors getting
 None instead when they happen with `throw_on_error=False`.
+
+### Async usage
+
+If you want to use non-blocking calls, put following attribute in API class declaration:
+
+```python
+class AsyncTestApi(GenericAPI):
+    generate_async_methods = True
+    posts = APIMethod('get', 'posts/')
+```
+
+This will generate additional async method for each defined APIMethod attribute, appending '_async' to the name. 
+In the above example, two methods will be generated: `posts()` and `posts_async()`. The former one returns parsed 
+JSON or string containing API response, while the latter returns AsyncRequest object, which can be later queried for 
+the result:
+
+```python
+api = AsyncTestApi()
+posts_r = api.posts_async()  # send HTTP request, but don't block
+posts = posts_r.result()     # retrieve result, blocking if the request hasn't finished yet
+```
 
 Installation
 ------------
