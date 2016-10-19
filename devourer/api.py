@@ -19,7 +19,7 @@ __all__ = ['APIMethod', 'GenericAPI', 'APIError', 'PrepareCallArgs']
 # Allows only methods used for common API communication - no reason to
 # support all existing methods (and I'd rather have this check in place
 # instead of allowing any string to be passed as http_method later on)
-ALLOWED_HTTP_METHODS = ['get', 'post', 'put', 'delete']
+ALLOWED_HTTP_METHODS = ['get', 'post', 'patch', 'put', 'delete']
 
 # Default time (seconds) to wait for thread before timing out
 DEFAULT_ASYNC_TIMEOUT = 5.0
