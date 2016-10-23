@@ -4,13 +4,11 @@
     :synopsis: This module extends basic api with gevent-based async capabilities.
 
 """
-import json
 from functools import partial
 
-from concurrent.futures import Future, ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 from six import with_metaclass
 
-from devourer import APIError
 from devourer import GenericAPIBase
 from devourer import GenericAPICreator
 

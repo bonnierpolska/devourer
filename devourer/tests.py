@@ -9,7 +9,14 @@ from . import GenericAPI, AsyncAPI, APIMethod, APIError, GenericAPICreator
 
 
 class GenericAPICreatorTest(unittest.TestCase):
+    """
+    Test API metaclass.
+    """
     def test_bases(self):
+        """
+        Check if only proper bases will be modified.
+        :return:
+        """
         self.assertRaises(AttributeError, lambda: GenericAPICreator('test', (object, ), {}))
 
 

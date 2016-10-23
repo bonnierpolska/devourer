@@ -6,9 +6,6 @@
 
 """
 import json
-import logging
-from copy import copy
-from functools import partial
 from string import Formatter
 from six import with_metaclass
 import requests
