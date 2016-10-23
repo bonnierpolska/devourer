@@ -17,7 +17,7 @@ from devourer import GenericAPICreator
 DEFAULT_ASYNC_TIMEOUT = 5.0
 
 # Default executor class.
-DEFAULT_EXECUTOR = ThreadPoolExecutor
+DEFAULT_EXECUTOR = ThreadPoolExecutor  # pylint: disable=invalid-name
 
 # Default number of executors for an API instance.
 DEFAULT_EXECUTORS = 2
