@@ -19,6 +19,9 @@ Contents:
 .. autoclass:: GenericAPI
     :members:
 
+.. autoclass:: AsyncAPI
+    :members:
+
 .. autoclass:: APIMethod
     :members:
 

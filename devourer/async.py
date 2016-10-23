@@ -13,10 +13,13 @@ from devourer import GenericAPIBase
 from devourer import GenericAPICreator
 
 
-# Default time (seconds) to wait for thread before timing out
+# Default time (seconds) to wait for thread before timing out.
 DEFAULT_ASYNC_TIMEOUT = 5.0
 
-# Default number of executors for an API instance
+# Default executor class.
+DEFAULT_EXECUTOR = ThreadPoolExecutor
+
+# Default number of executors for an API instance.
 DEFAULT_EXECUTORS = 2
 
 
@@ -30,8 +33,21 @@ class AsyncAPIBase(GenericAPIBase):
     _methods = None
 
     def __init__(self, *args, **kwargs):
+        """
+        Add async settings and invoke base initializer.
+        :param args:
+        :param executors: number of concurrent executor workers.
+        :param executor_class: executor class.
+        :param executor: executor instance. Takes priority over executor_class.
+        :param kwargs:
+        """
+        executor = kwargs.pop('executor', None)
         executors = kwargs.pop('executors', DEFAULT_EXECUTORS)
-        self._executor = ThreadPoolExecutor(max_workers=executors)
+        executor_class = kwargs.pop('executor_class', DEFAULT_EXECUTOR)
+        if executor:
+            self._executor = executor
+        else:
+            self._executor = executor_class(max_workers=executors)
         super(AsyncAPIBase, self).__init__(*args, **kwargs)
 
     def call(self, name, *args, **kwargs):
