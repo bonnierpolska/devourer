@@ -105,7 +105,7 @@ class APIMethod(object):
         """
         return self._params
 
-    def __call__(self, api, payload=None, **kwargs):
+    def __call__(self, api, payload=None, data=None, **kwargs):
         """
         This method sends a request to API through invoke function from API object
         the method is assigned to. It calls invoke with formatted schema, additional
@@ -113,6 +113,7 @@ class APIMethod(object):
 
         :param kwargs: Additional parameters to be passed to remote API.
         :param payload: The POST body to send along with the request as JSON.
+        :param data: Dict or encoded string to be sent as request body.
         :returns: API request's result.
         """
         params = {key: value for key, value in kwargs.items() if key not in self.params}
@@ -120,7 +121,7 @@ class APIMethod(object):
             schema = self.schema.format(**kwargs)
         else:
             schema = self.schema
-        return api.invoke(self.http_method, schema, params=params, payload=payload)
+        return api.invoke(self.http_method, schema, params=params, data=data, payload=payload)
 
 
 class GenericAPICreator(type):
@@ -255,17 +256,18 @@ class GenericAPIBase(object):
         """
         return lambda obj, *args, **kwargs: obj.call(name, *args, **kwargs)
 
-    def invoke(self, http_method, url, params, payload):
+    def invoke(self, http_method, url, params, data=None, payload=None):
         """
         This method makes a request to given API address concatenating the method
         path and passing along authentication data.
 
         :param http_method: http method to be used for this call.
         :param url: exact address to be concatenated to API address.
+        :param data: dict or encoded string to be sent as request body.
         :param payload: the payload dictionary to be sent in body of the request, encoded as JSON.
         :returns: response object as in requests.
         """
-        return getattr(requests, http_method)(self.url + url, auth=self.auth, params=params, json=payload)
+        return getattr(requests, http_method)(self.url + url, auth=self.auth, params=params, data=data, json=payload)
 
 
 class GenericAPI(with_metaclass(GenericAPICreator, GenericAPIBase)):

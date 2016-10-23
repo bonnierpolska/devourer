@@ -34,9 +34,9 @@ api = TestApi()
 posts = api.posts()
 post = api.post(id=posts[0]['id'])
 comments = api.comments(id=post['id'])
-new_post_id = api.add_post(userId=1,
-                           title='Breaking news',
-                           body='I just got devoured.')
+new_post_id = api.add_post(data={'userId': 1,
+                                 'title': 'Breaking news',
+                                 'body': 'I just got devoured.'})
 try:
     post = api.post(id=new_post_id)
 except APIError:
@@ -46,6 +46,11 @@ except APIError:
 The init function gives details so you don't need to repeat them elsewhere, enables parsing json responses and
 raising exceptions on error. You can also obtain raw string with `load_json=False` and silence errors getting
 None instead when they happen with `throw_on_error=False`.
+
+When calling methods:
+* `data` and `payload` kwargs will be passed to requests call as `data` and `json` parameters.
+* all keyword arguments matching schema will be used in schema.
+* all other kwargs will be passed to requests call as query string parameters.
 
 ### Async usage
 
