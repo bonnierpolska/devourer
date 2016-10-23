@@ -4,4 +4,4 @@ radon
 requests
 six
 sphinx
-gevent
+futures

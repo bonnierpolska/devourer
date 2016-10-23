@@ -40,5 +40,5 @@ raising exceptions on error. You can also obtain raw string with `load_json=Fals
 None instead when they happen with `throw_on_error=False`.
 
 """
-
-from .api import GenericAPI, APIMethod, APIError, PrepareCallArgs, GenericAPICreator, GenericAPIBase, AsyncRequest
+from .api import GenericAPI, APIMethod, APIError, PrepareCallArgs, GenericAPICreator, GenericAPIBase
+from .async import AsyncAPI, AsyncAPIBase

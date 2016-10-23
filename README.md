@@ -8,7 +8,7 @@ Devourer is a generic REST API client for Python 2.7 and 3.3+.
 You can also subclass it to wrap a set of system calls, FFI or a messy dependency.
 
 It features an object-oriented, declarative approach to simplify the communication.
-It depends on the brilliant requests package as the gateway to API server. 
+It depends on the brilliant requests package as the gateway to API server.
 
 ### Basic usage
 
@@ -29,7 +29,7 @@ class TestApi(GenericAPI):
                                       load_json=True,
                                       throw_on_error=True
                                      )
-                                     
+
 api = TestApi()
 posts = api.posts()
 post = api.post(id=posts[0]['id'])
@@ -49,23 +49,18 @@ None instead when they happen with `throw_on_error=False`.
 
 ### Async usage
 
-If you want to use non-blocking calls, put following attribute in API class declaration:
+Devourer supports asynchronous calls using concurrent.futures's ThreadPoolExecutor. API subclasses
+are created and used as usual, they just need to inherit from `AsyncAPI` instead of `GenericAPI`.
+
+Async mode will work with threads. They can be system threads or gevent threads, but that requires monkey patching them.
 
 ```python
-class AsyncTestApi(GenericAPI):
-    generate_async_methods = True
+class AsyncTestApi(AsyncAPI):
     posts = APIMethod('get', 'posts/')
-```
 
-This will generate additional async method for each defined APIMethod attribute, appending '_async' to the name. 
-In the above example, two methods will be generated: `posts()` and `posts_async()`. The former one returns parsed 
-JSON or string containing API response, while the latter returns AsyncRequest object, which can be later queried for 
-the result:
-
-```python
 api = AsyncTestApi()
-posts_r = api.posts_async()  # send HTTP request, but don't block
-posts = posts_r.result()     # retrieve result, blocking if the request hasn't finished yet
+posts = api.posts()  # Send HTTP request, but don't block. Returns a `concurrent.futures.Future`.
+result = posts_r.result()     # Retrieve result, blocking if the request hasn't finished yet.
 ```
 
 Installation
@@ -79,7 +74,7 @@ Feel free to browse the code and especially the tests to see what's going on beh
 The current version of docs is available on http://devourer.readthedocs.org/en/latest/.
 
 There's also an article on the thought process behind devourer on http://bujniewi.cz/devouring-an-api/ - it's a five
-minute read, but it could answer a few questions you might have. 
+minute read, but it could answer a few questions you might have.
 
 Questions and contact
 ---------------------

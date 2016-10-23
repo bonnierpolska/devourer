@@ -2,7 +2,15 @@
 This module contains tests for generic_api package.
 """
 import unittest
-from . import GenericAPI, AsyncRequest, APIMethod, APIError
+
+from concurrent.futures import Future
+
+from . import GenericAPI, AsyncAPI, APIMethod, APIError, GenericAPICreator
+
+
+class GenericAPICreatorTest(unittest.TestCase):
+    def test_bases(self):
+        self.assertRaises(AttributeError, lambda: GenericAPICreator('test', (object, ), {}))
 
 
 class APIMethodTest(unittest.TestCase):
@@ -19,12 +27,12 @@ class APIMethodTest(unittest.TestCase):
         self.assertFalse(method.params)
         method = APIMethod('get', 'a/{b}')
         self.assertEqual(method.params, ['b'])
-        self.assertRaises(ValueError, APIMethod, 'options', 'foo')
+        self.assertRaises(ValueError, APIMethod, 'nonexistant', 'foo')
 
 
 class GenericAPITest(unittest.TestCase):
     """
-    This test suite test correctnes of GenericAPI. Figures.
+    This test suite test correctness of GenericAPI. Figures.
     Oh, you need a working internet connection to run these tests.
     """
     @classmethod
@@ -39,7 +47,6 @@ class GenericAPITest(unittest.TestCase):
             known data to enable full testing without mocking.
             :return:
             """
-            generate_async_methods = True
             posts = APIMethod('get', 'posts/')
             comments = APIMethod('get', 'posts/{id}/comments')
             false = APIMethod('get', 'error')
@@ -54,6 +61,7 @@ class GenericAPITest(unittest.TestCase):
                 prepared = self.prepare('posts', *args, **kwargs)
                 result = prepared.call(self, *args, **kwargs)
                 return self.finalize('posts', result, *args, **kwargs)
+
         cls.TestAPI = TestAPI
         cls.api = TestAPI('http://jsonplaceholder.typicode.com/', None, load_json=True)
 
@@ -76,16 +84,6 @@ class GenericAPITest(unittest.TestCase):
         self.assertEqual(self.api.posts()[1]['id'], 2)
         self.assertEqual(self.api.comments(id=2)[0]['email'], 'Presley.Mueller@myrl.com')
 
-    def test_async_calls(self):
-        """
-        This test checks async calls
-        :return:
-        """
-        self.assertIsInstance(self.api.posts_async(), AsyncRequest)
-        self.assertEqual(self.api.posts_async().result()[1]['id'], 2)
-        self.assertEqual(self.api.comments_async(id=2).result()[0]['email'], 'Presley.Mueller@myrl.com')
-        self.assertEqual(self.api.false_async(id=1).result(), None)
-
     def test_exceptions(self):
         """
         This test call if exceptions are raised correctly.
@@ -101,6 +99,41 @@ class GenericAPITest(unittest.TestCase):
         """
         api = self.TestAPI('http://jsonplaceholder.typicode.com/', None, load_json=False)
         self.assertNotEqual(api.comments(id=2).find(b'Presley.Mueller@myrl.com'), -1)
+
+
+class AsyncAPITest(unittest.TestCase):
+    """
+    This test suite test correctness of AsyncAPI. Figures.
+    Oh, you need a working internet connection to run these tests.
+    """
+    @classmethod
+    def setUpClass(cls):
+        """
+        This method creates resources needed to test GenericAPI.
+        :return:
+        """
+        class TestAPI(AsyncAPI):
+            """
+            This class uses http://jsonplaceholder.typicode.com/ as API with
+            known data to enable full testing without mocking.
+            :return:
+            """
+            posts = APIMethod('get', 'posts/')
+            comments = APIMethod('get', 'posts/{id}/comments')
+            false = APIMethod('get', 'error')
+
+        cls.TestAPI = TestAPI
+        cls.api = TestAPI('http://jsonplaceholder.typicode.com/', None, load_json=True)
+
+    def test_async_calls(self):
+        """
+        This test checks async calls
+        :return:
+        """
+        self.assertIsInstance(self.api.posts(), Future)
+        self.assertEqual(self.api.posts().result()[1]['id'], 2)
+        self.assertEqual(self.api.comments(id=2).result()[0]['email'], 'Presley.Mueller@myrl.com')
+        self.assertEqual(self.api.false(id=1).result(), {})
 
 
 if __name__ == '__main__':
