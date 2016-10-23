@@ -19,7 +19,7 @@ __all__ = ['APIMethod', 'GenericAPI', 'APIError', 'PrepareCallArgs']
 # Allows only methods used for common API communication - no reason to
 # support all existing methods (and I'd rather have this check in place
 # instead of allowing any string to be passed as http_method later on)
-ALLOWED_HTTP_METHODS = ['get', 'post', 'put', 'delete']
+ALLOWED_HTTP_METHODS = ['get', 'post', 'patch', 'put', 'delete']
 
 # Default time (seconds) to wait for thread before timing out
 DEFAULT_ASYNC_TIMEOUT = 5.0
@@ -148,17 +148,18 @@ class APIMethod(object):
         """
         return self._params
 
-    def __call__(self, api, **kwargs):
+    def __call__(self, api, payload=None, **kwargs):
         """
         This method sends a request to API through invoke function from API object
         the method is assigned to. It calls invoke with formatted schema, additional
         arguments and http method already calculated.
 
         :param kwargs: Additional parameters to be passed to remote API.
+        :param payload: The POST body to send along with the request as JSON.
         :returns: API request's result.
         """
         params = {key: value for key, value in kwargs.items() if key not in self.params}
-        return api.invoke(self.http_method, self.schema.format(**kwargs), params=params)
+        return api.invoke(self.http_method, self.schema.format(**kwargs), params=params, payload=payload)
 
 
 class GenericAPICreator(type):
@@ -315,16 +316,17 @@ class GenericAPIBase(object):
         """
         return lambda obj, *args, **kwargs: obj.call_async(name, *args, **kwargs)
 
-    def invoke(self, http_method, url, params):
+    def invoke(self, http_method, url, params, payload):
         """
         This method makes a request to given API address concatenating the method
         path and passing along authentication data.
 
         :param http_method: http method to be used for this call.
         :param url: exact address to be concatenated to API address.
+        :param payload: the payload dictionary to be sent in body of the request, encoded as JSON.
         :returns: response object as in requests.
         """
-        return getattr(requests, http_method)(self.url + url, auth=self.auth, params=params)
+        return getattr(requests, http_method)(self.url + url, auth=self.auth, params=params, json=payload)
 
 class GenericAPI(with_metaclass(GenericAPICreator, GenericAPIBase)):
     """This is the base API representation class.
