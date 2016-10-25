@@ -4,6 +4,7 @@ This module contains tests for generic_api package.
 import unittest
 
 from concurrent.futures import Future
+from concurrent.futures import ThreadPoolExecutor
 
 from . import GenericAPI, AsyncAPI, APIMethod, APIError, GenericAPICreator
 
@@ -131,6 +132,8 @@ class AsyncAPITest(unittest.TestCase):
 
         cls.TestAPI = TestAPI
         cls.api = TestAPI('http://jsonplaceholder.typicode.com/', None, load_json=True)
+        cls.executor_api = TestAPI('http://jsonplaceholder.typicode.com/', None, load_json=True,
+                                   executor=ThreadPoolExecutor(max_workers=1))
 
     def test_async_calls(self):
         """
@@ -139,8 +142,8 @@ class AsyncAPITest(unittest.TestCase):
         """
         self.assertIsInstance(self.api.posts(), Future)
         self.assertEqual(self.api.posts().result()[1]['id'], 2)
-        self.assertEqual(self.api.comments(id=2).result()[0]['email'], 'Presley.Mueller@myrl.com')
-        self.assertEqual(self.api.false(id=1).result(), {})
+        self.assertEqual(self.executor_api.comments(id=2).result()[0]['email'], 'Presley.Mueller@myrl.com')
+        self.assertEqual(self.executor_api.false(id=1).result(), {})
 
 
 if __name__ == '__main__':

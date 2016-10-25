@@ -105,7 +105,7 @@ class APIMethod(object):
         """
         return self._params
 
-    def __call__(self, api, payload=None, data=None, **kwargs):
+    def __call__(self, api, payload=None, data=None, headers=None, **kwargs):
         """
         This method sends a request to API through invoke function from API object
         the method is assigned to. It calls invoke with formatted schema, additional
@@ -114,6 +114,7 @@ class APIMethod(object):
         :param kwargs: Additional parameters to be passed to remote API.
         :param payload: The POST body to send along with the request as JSON.
         :param data: Dict or encoded string to be sent as request body.
+        :param headers: Dict of headers to be send along with api call.
         :returns: API request's result.
         """
         params = {key: value for key, value in kwargs.items() if key not in self.params}
@@ -121,7 +122,7 @@ class APIMethod(object):
             schema = self.schema.format(**kwargs)
         else:
             schema = self.schema
-        return api.invoke(self.http_method, schema, params=params, data=data, payload=payload)
+        return api.invoke(self.http_method, schema, params=params, data=data, payload=payload, headers=headers)
 
 
 class GenericAPICreator(type):
@@ -176,7 +177,7 @@ class GenericAPIBase(object):
     """
     _methods = None
 
-    def __init__(self, url, auth, throw_on_error=False, load_json=False):
+    def __init__(self, url, auth, throw_on_error=False, load_json=False, headers=None):
         """
         This method initializes a concrete API class.
 
@@ -185,12 +186,14 @@ class GenericAPIBase(object):
         no authentication, requests' Auth object otherwise.
         :param throw_on_error: should an error be thrown on response with code >= 400
         (True) or full response object be returned (False).
+        :param headers: Headers to be passed to requests call.
         :returns: None
         """
         self.url = url
         self.auth = auth
         self.throw_on_error = throw_on_error
         self.load_json = load_json
+        self.headers = headers
         for item in self._methods.values():
             item.api = self
 
@@ -256,7 +259,7 @@ class GenericAPIBase(object):
         """
         return lambda obj, *args, **kwargs: obj.call(name, *args, **kwargs)
 
-    def invoke(self, http_method, url, params, data=None, payload=None):
+    def invoke(self, http_method, url, params, data=None, payload=None, headers=None):
         """
         This method makes a request to given API address concatenating the method
         path and passing along authentication data.
@@ -265,9 +268,12 @@ class GenericAPIBase(object):
         :param url: exact address to be concatenated to API address.
         :param data: dict or encoded string to be sent as request body.
         :param payload: the payload dictionary to be sent in body of the request, encoded as JSON.
+        :param headers: the headers to be sent with http request.
         :returns: response object as in requests.
         """
-        return getattr(requests, http_method)(self.url + url, auth=self.auth, params=params, data=data, json=payload)
+        headers = headers or self.headers
+        return getattr(requests, http_method)(self.url + url, auth=self.auth, params=params, data=data, json=payload,
+                                              headers=headers)
 
 
 class GenericAPI(with_metaclass(GenericAPICreator, GenericAPIBase)):
