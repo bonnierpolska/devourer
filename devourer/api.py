@@ -23,7 +23,13 @@ class APIError(Exception):
     """
     An error while querying the API.
     """
-    pass
+    def __init__(self, message, **kwargs):
+        """
+        Accept additional payload contained in exception object.
+        :param kwargs:
+        """
+        super(APIError, self).__init__(message)
+        self.response = kwargs.pop('response', None)
 
 
 class PrepareCallArgs(object):  # pylint: disable=too-few-public-methods
@@ -226,7 +232,7 @@ class GenericAPIBase(object):
         """
         if self.throw_on_error and result.status_code >= 400:
             error_msg = "Error when invoking {} with parameters {} {}: {}"
-            raise APIError(error_msg.format(name, args, kwargs, result.__dict__))
+            raise APIError(error_msg.format(name, args, kwargs, result.__dict__), response=result)
         if self.load_json:
             content = result.content if isinstance(result.content, str) else result.content.decode('utf-8')
             return json.loads(content)
