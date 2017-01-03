@@ -4,8 +4,10 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
+  - "3.6"
 script:
   # need to skip pylint on 3.5 since it doesn't work yet.
   - if [[ $TRAVIS_PYTHON_VERSION != '3.5' ]]; then pylint devourer --rcfile=.pylintrc; fi
   - coverage run --source=devourer -m devourer.tests && coverage report -m
-  - cd docs && make html
+  # skipping docs on 3.3 since Sphinx dropped support
+  - if [[ $TRAVIS_PYTHON_VERSION != '3.3' ]]; then cd docs && make html; fi
