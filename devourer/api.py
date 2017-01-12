@@ -63,7 +63,7 @@ class APIMethod(object):
 
     >>> post = APIMethod('get', 'post/{id}/')
     """
-    def __init__(self, http_method, schema):
+    def __init__(self, http_method, schema, requests_kwargs=None):
         """
         This method initializes instance's properties, especially schema and parameters
         list which is inferred from schema.
@@ -71,6 +71,7 @@ class APIMethod(object):
         :param schema: Python 3-style format string containing relative method address
         with parameters.
         :param http_method: HTTP method to call the API method with.
+        :param requests_kwargs: any additional keyword arguments to be passed to requests call.
         :returns: None
         """
         self.name = None
@@ -80,6 +81,7 @@ class APIMethod(object):
         self._params = []
         self._schema = None
         self.schema = schema
+        self.requests_kwargs = requests_kwargs or {}
 
     @property
     def schema(self):
@@ -128,7 +130,8 @@ class APIMethod(object):
             schema = self.schema.format(**kwargs)
         else:
             schema = self.schema
-        return api.invoke(self.http_method, schema, params=params, data=data, payload=payload, headers=headers)
+        return api.invoke(self.http_method, schema, params=params, data=data, payload=payload, headers=headers,
+                          requests_kwargs=self.requests_kwargs)
 
 
 class GenericAPICreator(type):
@@ -265,7 +268,7 @@ class GenericAPIBase(object):
         """
         return lambda obj, *args, **kwargs: obj.call(name, *args, **kwargs)
 
-    def invoke(self, http_method, url, params, data=None, payload=None, headers=None):
+    def invoke(self, http_method, url, params, data=None, payload=None, headers=None, requests_kwargs=None):
         """
         This method makes a request to given API address concatenating the method
         path and passing along authentication data.
@@ -278,8 +281,9 @@ class GenericAPIBase(object):
         :returns: response object as in requests.
         """
         headers = headers or self.headers
+        kwargs = requests_kwargs or {}
         return getattr(requests, http_method)(self.url + url, auth=self.auth, params=params, data=data, json=payload,
-                                              headers=headers)
+                                              headers=headers, **kwargs)
 
 
 class GenericAPI(with_metaclass(GenericAPICreator, GenericAPIBase)):
