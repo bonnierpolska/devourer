@@ -173,7 +173,8 @@ class GenericAPICreator(type):
                 methods['finalize_{}'.format(key)] = attrs['finalize'] if \
                     'finalize' in attrs else methods_from.finalize
         for key in attrs['_methods']:
-            del attrs[key]
+            if key in attrs:
+                del attrs[key]
             if 'call_{}'.format(key) in attrs:
                 del attrs['call_{}'.format(key)]
         methods.update(attrs)
