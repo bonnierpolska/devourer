@@ -159,7 +159,7 @@ class GenericAPICreator(type):
 
         attrs['_methods'] = getattr(methods_from, '_methods', None)
         if attrs['_methods'] is None:
-            attrs['methods'] = {}
+            attrs['_methods'] = {}
         else:
             attrs['_methods'] = attrs['_methods'].copy()
         for key, item in attrs.items():
