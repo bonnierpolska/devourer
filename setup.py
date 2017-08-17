@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name='devourer',
     packages=['devourer'],
-    version='0.4.5',
+    version='0.4.6',
     install_requires=[
         'requests',
         'futures',

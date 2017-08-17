@@ -157,7 +157,11 @@ class GenericAPICreator(type):
         if methods_from is None:
             raise AttributeError("{} using GenericApiCreator without inheriting from GenericAPIBase.")
 
-        attrs['_methods'] = getattr(methods_from, '_methods', {})
+        attrs['_methods'] = getattr(methods_from, '_methods', None)
+        if attrs['_methods'] is None:
+            attrs['methods'] = {}
+        else:
+            attrs['_methods'] = attrs['_methods'].copy()
         for key, item in attrs.items():
             if isinstance(item, APIMethod):
                 attrs['_methods'][key] = item
