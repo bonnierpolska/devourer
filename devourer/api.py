@@ -333,4 +333,3 @@ class GenericAPI(with_metaclass(GenericAPICreator, GenericAPIBase)):
     >>>         return json.loads(result.content)
     >>>     return result.content
     """
-    pass
