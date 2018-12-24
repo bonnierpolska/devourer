@@ -9,8 +9,8 @@ from functools import partial
 from concurrent.futures import ThreadPoolExecutor
 from six import with_metaclass
 
-from devourer import GenericAPIBase
-from devourer import GenericAPICreator
+from .api import GenericAPIBase
+from .api import GenericAPICreator
 
 
 # Default time (seconds) to wait for thread before timing out.
@@ -115,4 +115,3 @@ class AsyncAPI(with_metaclass(GenericAPICreator, AsyncAPIBase)):
     >>>         return json.loads(result.content)
     >>>     return result.content
     """
-    pass

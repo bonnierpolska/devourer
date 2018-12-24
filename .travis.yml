@@ -1,13 +1,12 @@
 language: python
 python:
   - "2.7"
-  - "3.3"
   - "3.4"
   - "3.5"
   - "3.6"
 script:
   # need to skip pylint on 3.6 since it doesn't work yet.
-  - if [[ $TRAVIS_PYTHON_VERSION != '3.6' ]]; then pylint devourer --rcfile=.pylintrc; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pylint devourer --rcfile=.pylintrc; fi
+  - if [[ $TRAVIS_PYTHON_VERSION != '2.7' ]]; then pylint devourer --rcfile=.pylintrc3; fi
   - coverage run --source=devourer -m devourer.tests && coverage report -m
-  # skipping docs on 3.3 since Sphinx dropped support
-  - if [[ $TRAVIS_PYTHON_VERSION != '3.3' ]]; then cd docs && make html; fi
+  - cd docs && make html
