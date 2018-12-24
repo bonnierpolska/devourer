@@ -3,7 +3,7 @@ Devourer
 
 [![Build Status](https://travis-ci.org/bonnierpolska/devourer.svg)](https://travis-ci.org/bonnierpolska/devourer)
 
-Devourer is a generic REST API client for Python 2.7 and 3.3+.
+Devourer is a generic REST API client for Python 2.7 and 3.4+.
 
 You can also subclass it to wrap a set of system calls, FFI or a messy dependency.
 

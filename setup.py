@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name='devourer',
     packages=['devourer'],
-    version='0.4.8',
+    version='0.5.0',
     install_requires=[
         'requests',
         'futures',
@@ -14,7 +14,7 @@ setup(
     author='Bonnier Business Polska / Krzysztof Bujniewicz',
     author_email='racech@gmail.com',
     url='https://github.com/bonnierpolska/devourer',
-    download_url='https://github.com/bonnierpolska/devourer/tarball/0.4.8',
+    download_url='https://github.com/bonnierpolska/devourer/tarball/0.5.0',
     keywords=['api', 'generic api', 'api client'],
     classifiers=[]
 )
