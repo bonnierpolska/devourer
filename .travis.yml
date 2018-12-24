@@ -4,6 +4,7 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
+  - "3.7"
 script:
   # need to skip pylint on 3.6 since it doesn't work yet.
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pylint devourer --rcfile=.pylintrc; fi
