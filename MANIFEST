@@ -3,5 +3,5 @@ setup.cfg
 setup.py
 devourer/__init__.py
 devourer/api.py
-devourer/async.py
+devourer/async_api.py
 devourer/tests.py

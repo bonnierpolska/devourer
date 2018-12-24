@@ -1,5 +1,5 @@
 """
-.. module:: async
+.. module:: async_api
     :platform: Unix, Windows
     :synopsis: This module extends basic api with gevent-based async capabilities.
 
