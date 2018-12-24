@@ -4,9 +4,11 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-  - "3.7"
-    dist: xenial
-    sudo: true
+matrix:
+  include:
+    - python: 3.7
+      dist: xenial
+      sudo: true
 script:
   # need to skip pylint on 3.6 since it doesn't work yet.
   - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then pylint devourer --rcfile=.pylintrc; fi
